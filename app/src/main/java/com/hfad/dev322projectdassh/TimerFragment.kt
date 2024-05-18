@@ -6,7 +6,7 @@ import android.widget.Button
 import android.widget.Chronometer
 
 
-class MainActivity : AppCompatActivity() {
+class TimerFragment : AppCompatActivity() {
     lateinit var stopwatch: Chronometer //The chronometer
     var running = false //Is the chronometer running?
     var offset: Long = 0 //The base offset for the chronometer
