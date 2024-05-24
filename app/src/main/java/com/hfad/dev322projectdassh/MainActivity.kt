@@ -1,4 +1,9 @@
 package com.hfad.dev322projectdassh
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
@@ -6,10 +11,14 @@ import android.widget.Button
 import android.widget.Chronometer
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SensorEventListener {
     lateinit var stopwatch: Chronometer //The chronometer
     var running = false //Is the chronometer running?
     var offset: Long = 0 //The base offset for the chronometer
+
+    //Sensor Stuff
+    private lateinit var mSensorManager : SensorManager
+    private var mAccelerometer : Sensor ?= null
 
     //Add key Strings for use with the Bundle
     val OFFSET_KEY = "offset"
@@ -22,6 +31,10 @@ class MainActivity : AppCompatActivity() {
         //Get a reference to the stopwatch
         stopwatch = findViewById<Chronometer>(R.id.stopwatch)
         //Restore the previous state
+
+        mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+
         if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
@@ -61,6 +74,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        mSensorManager.unregisterListener(this)
+
         if (running) {
             saveOffset()
             stopwatch.stop()
@@ -69,6 +85,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME)
+
         if (running) {
             setBaseTime()
             stopwatch.start()
@@ -90,5 +109,19 @@ class MainActivity : AppCompatActivity() {
 
     fun saveOffset() {
         offset = SystemClock.elapsedRealtime() - stopwatch.base
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event != null) {
+            if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION) {
+                //event.values[0]
+                //^^^^accelerometer data
+                return
+            }
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        return
     }
 }
