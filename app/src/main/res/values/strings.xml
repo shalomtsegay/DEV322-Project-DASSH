@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">DEV322 Project DASSH</string>
+    <string name="welcome_text">Welcome to the Dassh App for Running!</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="reset">Reset</string>

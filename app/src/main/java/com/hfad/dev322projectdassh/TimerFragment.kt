@@ -1,38 +1,47 @@
 package com.hfad.dev322projectdassh
-import androidx.appcompat.app.AppCompatActivity
+
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Chronometer
+import androidx.fragment.app.Fragment
 
+class TimerFragment : Fragment() {
+    private lateinit var stopwatch: Chronometer // The chronometer
+    private var running = false // Is the chronometer running?
+    private var offset: Long = 0 // The base offset for the chronometer
 
-class TimerFragment : AppCompatActivity() {
-    lateinit var stopwatch: Chronometer //The chronometer
-    var running = false //Is the chronometer running?
-    var offset: Long = 0 //The base offset for the chronometer
+    // Add key Strings for use with the Bundle
+    private val OFFSET_KEY = "offset"
+    private val RUNNING_KEY = "running"
+    private val BASE_KEY = "base"
 
-    //Add key Strings for use with the Bundle
-    val OFFSET_KEY = "offset"
-    val RUNNING_KEY = "running"
-    val BASE_KEY = "base"
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_timer, container, false)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        //Get a reference to the stopwatch
-        stopwatch = findViewById<Chronometer>(R.id.stopwatch)
-        //Restore the previous state
+        // Get a reference to the stopwatch
+        stopwatch = view.findViewById(R.id.stopwatch)
+
+        // Restore the previous state
         if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
             if (running) {
                 stopwatch.base = savedInstanceState.getLong(BASE_KEY)
                 stopwatch.start()
-            } else setBaseTime()
+            } else {
+                setBaseTime()
+            }
         }
 
-        //start button
-        val startButton = findViewById<Button>(R.id.start_button)
+        // Start button
+        val startButton = view.findViewById<Button>(R.id.start_button)
         startButton.setOnClickListener {
             if (!running) {
                 setBaseTime()
@@ -41,8 +50,8 @@ class TimerFragment : AppCompatActivity() {
             }
         }
 
-        //pause button
-        val pauseButton = findViewById<Button>(R.id.pause_button)
+        // Pause button
+        val pauseButton = view.findViewById<Button>(R.id.pause_button)
         pauseButton.setOnClickListener {
             if (running) {
                 saveOffset()
@@ -51,12 +60,14 @@ class TimerFragment : AppCompatActivity() {
             }
         }
 
-        //reset button
-        val resetButton = findViewById<Button>(R.id.reset_button)
+        // Reset button
+        val resetButton = view.findViewById<Button>(R.id.reset_button)
         resetButton.setOnClickListener {
             offset = 0
             setBaseTime()
         }
+
+        return view
     }
 
     override fun onPause() {
@@ -76,19 +87,18 @@ class TimerFragment : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        savedInstanceState.putLong(OFFSET_KEY, offset)
-        savedInstanceState.putBoolean(RUNNING_KEY, running)
-        savedInstanceState.putLong(BASE_KEY, stopwatch.base)
-        super.onSaveInstanceState(savedInstanceState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putLong(OFFSET_KEY, offset)
+        outState.putBoolean(RUNNING_KEY, running)
+        outState.putLong(BASE_KEY, stopwatch.base)
+        super.onSaveInstanceState(outState)
     }
 
-
-    fun setBaseTime() {
+    private fun setBaseTime() {
         stopwatch.base = SystemClock.elapsedRealtime() - offset
     }
 
-    fun saveOffset() {
+    private fun saveOffset() {
         offset = SystemClock.elapsedRealtime() - stopwatch.base
     }
 }

@@ -7,19 +7,19 @@ import android.widget.Chronometer
 
 
 class MainActivity : AppCompatActivity() {
-    lateinit var stopwatch: Chronometer //The chronometer
+    /*    lateinit var stopwatch: Chronometer //The chronometer
     var running = false //Is the chronometer running?
     var offset: Long = 0 //The base offset for the chronometer
 
     //Add key Strings for use with the Bundle
     val OFFSET_KEY = "offset"
     val RUNNING_KEY = "running"
-    val BASE_KEY = "base"
+    val BASE_KEY = "base"*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //Get a reference to the stopwatch
+        /*//Get a reference to the stopwatch
         stopwatch = findViewById<Chronometer>(R.id.stopwatch)
         //Restore the previous state
         if (savedInstanceState != null) {
@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
                 stopwatch.base = savedInstanceState.getLong(BASE_KEY)
                 stopwatch.start()
             } else setBaseTime()
-        }
+        }*/
 
-        //start button
+        /*        //start button
         val startButton = findViewById<Button>(R.id.start_button)
         startButton.setOnClickListener {
             if (!running) {
@@ -90,5 +90,6 @@ class MainActivity : AppCompatActivity() {
 
     fun saveOffset() {
         offset = SystemClock.elapsedRealtime() - stopwatch.base
+    }*/
     }
 }
