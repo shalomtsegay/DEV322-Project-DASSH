@@ -1,17 +1,28 @@
 package com.hfad.dev322projectdassh
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
 import android.widget.Button
 import android.widget.Chronometer
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
-class TimerFragment : AppCompatActivity(), SensorEventListener {
+// https://www.tutorialspoint.com/how-to-get-the-current-gps-location-programmatically-on-android-using-kotlin
+
+class TimerFragment : AppCompatActivity(), SensorEventListener, LocationListener {
     lateinit var stopwatch: Chronometer //The chronometer
     var running = false //Is the chronometer running?
     var offset: Long = 0 //The base offset for the chronometer
@@ -19,6 +30,11 @@ class TimerFragment : AppCompatActivity(), SensorEventListener {
     //Sensor Stuff
     private lateinit var mSensorManager : SensorManager
     private var mAccelerometer : Sensor?= null
+
+    //GPS Stuff
+    private lateinit var locationManager: LocationManager
+    private lateinit var tvGpsLocation: TextView
+    private val locationPermissionCode = 2
 
     //Add key Strings for use with the Bundle
     val OFFSET_KEY = "offset"
@@ -32,6 +48,7 @@ class TimerFragment : AppCompatActivity(), SensorEventListener {
         stopwatch = findViewById<Chronometer>(R.id.stopwatch)
         //Restore the previous state
 
+        //Sensor stuff
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
 
@@ -124,5 +141,33 @@ class TimerFragment : AppCompatActivity(), SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         return
     }
+
+    //GPS Stuff
+    override fun onLocationChanged(location: Location) {
+        return
+    }
+
+    //GPS Stuff
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == locationPermissionCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    //GPS Stuff
+    private fun getLocation() {
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), locationPermissionCode)
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+    }
+
 
 }
