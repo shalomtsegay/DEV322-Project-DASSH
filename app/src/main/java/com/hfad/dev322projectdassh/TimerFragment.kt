@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Chronometer
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 
 class TimerFragment : Fragment(), SensorEventListener {
@@ -28,12 +29,19 @@ class TimerFragment : Fragment(), SensorEventListener {
     //Sensor Stuff
     private lateinit var mSensorManager : SensorManager
     private var mAccelerometer : Sensor ?= null
+    private var resume = false;
+
+    // needed for find view by id
+    private var rootView: View? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_timer, container, false)
+
+        rootView = view
+
 
         // Initialize sensor manager and accelerometer
         mSensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -126,14 +134,12 @@ class TimerFragment : Fragment(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event != null) {
             if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION) {
-                // Handle accelerometer data
-                val acceleration = event.values[0]
-                // Do something with the accelerometer data
+                rootView?.findViewById<TextView>(R.id.textView)?.text = event.values[0].toString()
             }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Implement if needed
+        return
     }
 }

@@ -37,4 +37,10 @@
         android:layout_height="wrap_content"
         android:text="@string/reset" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="182dp"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
 </LinearLayout>
