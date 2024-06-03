@@ -12,6 +12,7 @@ import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.widget.Button
 import android.widget.Chronometer
 import android.widget.TextView
@@ -29,22 +30,19 @@ class TimerFragment : AppCompatActivity(), SensorEventListener, LocationListener
     lateinit var stopwatch: Chronometer //The chronometer
     var running = false //Is the chronometer running?
     var offset: Long = 0 //The base offset for the chronometer
-    var speed: Float = 0.0f
+
+    //Step count stuff
+    var moving = false //Is the person moving
+    private var totalSteps = 0f
+    private var previousTotalSteps = 0f
 
     //Sensor Stuff
     private lateinit var mSensorManager : SensorManager
-    private var mAccelerometer : Sensor?= null
 
     //GPS Stuff
     private lateinit var locationManager: LocationManager
     private lateinit var tvGpsLocation: TextView
     private val locationPermissionCode = 2
-
-    //Time Stuff
-    val timeSource = TimeSource.Monotonic
-    var time = timeSource.markNow()
-        //We use this to measure how long between each accelerometer reporting...
-        //which will then be used in the calculation of speed and, finally, distance.
 
     //Add key Strings for use with the Bundle
     val OFFSET_KEY = "offset"
@@ -60,7 +58,6 @@ class TimerFragment : AppCompatActivity(), SensorEventListener, LocationListener
 
         //Sensor stuff
         mSensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
 
         if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
@@ -112,15 +109,49 @@ class TimerFragment : AppCompatActivity(), SensorEventListener, LocationListener
 
     override fun onResume() {
         super.onResume()
+        moving = true
 
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL)
-            //NORMAL = ~50ms or 1/20th of a second
+        val stepSensor = mSensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        if(stepSensor == null){
+            findViewById<TextView>(R.id.textView).text = "NO SENSOR!"
+        } else {
+            mSensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_GAME)
+        }
 
         if (running) {
             setBaseTime()
             stopwatch.start()
             offset = 0
         }
+    }
+
+    //Step Count Stuff
+    fun resetSteps() {
+        var tv_stepsTaken = findViewById<TextView>(R.id.textView)
+        tv_stepsTaken.setOnClickListener() {
+            Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
+        }
+
+        tv_stepsTaken.setOnLongClickListener {
+            previousTotalSteps = totalSteps
+            tv_stepsTaken.text = 0.toString()
+            saveData()
+            true
+        }
+    }
+
+    private fun saveData() {
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putFloat("key1", previousTotalSteps)
+        editor.apply()
+    }
+
+    private fun loadData() {
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val savedNumber = sharedPreferences.getFloat("key1", 0f)
+        Log.d("MainActivity", "$savedNumber")
+        previousTotalSteps = savedNumber
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
@@ -140,30 +171,14 @@ class TimerFragment : AppCompatActivity(), SensorEventListener, LocationListener
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (event != null) {
-            if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION) {
-                var acceleration = event.values[0]
-                acceleration = String.format("%.1f", acceleration).toFloat()
-                var time2: String = time.elapsedNow().toString()
-// Ensure time2 has at least 2 characters
-                if (time2.length >= 2) {
-                    time2 = time2.substring(0, 2)
-                    // Check if the substring is a valid integer
-                    try {
-                        var time3: Float = time2.toFloat()
-                        val timeDiff: Float = (1000 - time3) / 1000
-                        speed = speed + (acceleration * timeDiff)
-                            //new speed = old speed + (acceleration * time)
-                        findViewById<TextView>(R.id.textView).text = speed.toString()
-                        println("Converted value: $time3")
-                    } catch (e: NumberFormatException) {
-                        println("Error: The substring '$time2' is not a valid integer")
-                    }
-                } else {
-                    println("Error: 'time2' is too short to extract a 2-character substring")
-                }
-                time = timeSource.markNow()
-            }
+        var tv_stepsTaken = findViewById<TextView>(R.id.textView)
+
+        if(moving) {
+            totalSteps = event!!.values[0]
+
+            val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
+
+            tv_stepsTaken.text = ("$currentSteps")
         }
     }
 
