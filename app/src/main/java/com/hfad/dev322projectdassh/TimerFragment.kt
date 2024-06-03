@@ -134,7 +134,9 @@ class TimerFragment : Fragment(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event != null) {
             if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION) {
-                rootView?.findViewById<TextView>(R.id.textView)?.text = event.values[0].toString()
+                //event.values[0]
+                //^^^^accelerometer data
+                return
             }
         }
     }
