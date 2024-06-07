@@ -36,11 +36,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/reset" />
+<!--GPS Button -->
+    <Button
+        android:id="@+id/getLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get location" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="182dp"
         android:layout_height="wrap_content"
         android:text="TextView" />
+
+    <TextView
+        android:id="@+id/gpsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Current GPS Location"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 
 </LinearLayout>
