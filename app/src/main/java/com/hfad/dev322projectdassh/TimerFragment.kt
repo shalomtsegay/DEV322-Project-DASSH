@@ -22,6 +22,16 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import android.util.Log // API Stuff
+import android.os.Handler // API Stuff
+import android.os.Looper // API Stuff
+import okhttp3.OkHttpClient // API Stuff
+import okhttp3.Request // API Stuff
+import java.io.IOException // API Stuff
+import org.osmdroid.util.GeoPoint // osmdroid Stuff
+
+
 
 class TimerFragment : Fragment(), SensorEventListener, LocationListener {
     private lateinit var stopwatch: Chronometer // The chronometer
@@ -35,14 +45,20 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
 
     //Sensor Stuff
-    private lateinit var mSensorManager : SensorManager
-    private var mAccelerometer : Sensor ?= null
+    private lateinit var mSensorManager: SensorManager
+    private var mAccelerometer: Sensor? = null
     private var resume = false;
 
     // GPS Stuff
     private lateinit var locationManager: LocationManager
     private lateinit var tvGpsLocation: TextView
     private val locationPermissionCode = 2
+
+    // API Stuff
+    private var handler: Handler? = null
+    private val interval = 5000L // 5 seconds
+
+    private val locationList: MutableList<Location> = mutableListOf() // osmdroid Stuff
 
 
 
@@ -54,6 +70,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_timer, container, false)
+        Log.d("TimerFragment", "onCreateView called") // Simple log statement for testing
+
 
         rootView = view
 
@@ -63,6 +81,9 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         // Initialize sensor manager and accelerometer
         mSensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+
+        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
 
 
         // Get a reference to the stopwatch
@@ -87,6 +108,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
                 setBaseTime()
                 stopwatch.start()
                 running = true
+                startLocationUpdates()
+
             }
         }
 
@@ -97,6 +120,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
                 saveOffset()
                 stopwatch.stop()
                 running = false
+                stopLocationUpdates() // API Stuff
+
             }
         }
 
@@ -113,11 +138,25 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             getLocation()
         }
 
+        // Finish Run button
+        val finishRunButton = view.findViewById<Button>(R.id.finishRunButton)
+        finishRunButton.setOnClickListener {
+            val bundle = Bundle()
+            Log.d("TimerFragment", "Finish Run button clicked. Locations: ${locationList.size}") // Log statement for testing
+            val geoPointList = ArrayList(locationList.map { GeoPoint(it.latitude, it.longitude) }) // osmdroid Stuff
+            bundle.putParcelableArrayList("locations", geoPointList)
+
+            view.findNavController().navigate(R.id.action_timerFragment_to_resultsFragment, bundle)
+        }
+
+
         return view
     }
 
     override fun onPause() {
         super.onPause()
+        Log.d("TimerFragment", "onPause called") // Log statement for testing
+
 
         mSensorManager.unregisterListener(this)
 
@@ -129,6 +168,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
     override fun onResume() {
         super.onResume()
+        Log.d("TimerFragment", "onResume called") // Log statement for testing
+
 
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME)
 
@@ -140,6 +181,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        Log.d("TimerFragment", "onSaveInstanceState called") // Log statement for testing
         outState.putLong(OFFSET_KEY, offset)
         outState.putBoolean(RUNNING_KEY, running)
         outState.putLong(BASE_KEY, stopwatch.base)
@@ -172,6 +214,10 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
     override fun onLocationChanged(location: Location) {
         tvGpsLocation.text =
             "Latitude: " + location.latitude + " , Longitude: " + location.longitude
+        logLocationToAPI(location) // API Stuff
+        locationList.add(location) // osmdroid Stuff
+
+
     }
 
     //GPS Stuff
@@ -184,6 +230,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         if (requestCode == locationPermissionCode) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(requireContext(), "Permission Granted", Toast.LENGTH_SHORT).show()
+                startLocationUpdates() // API Stuff
+
             } else {
                 Toast.makeText(requireContext(), "Permission Denied", Toast.LENGTH_SHORT).show()
             }
@@ -193,7 +241,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
     //GPS Stuff
     private fun getLocation() {
-        locationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager =
+            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if ((ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -206,5 +255,65 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             )
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+    }
+
+    private fun startLocationUpdates() { // API Stuff
+        Log.d("API", "Starting location updates") // Log statement to verify
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+            handler = Handler(Looper.getMainLooper())
+            handler?.postDelayed(object : Runnable {
+                override fun run() {
+                    if (ContextCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        locationManager.requestSingleUpdate(
+                            LocationManager.GPS_PROVIDER,
+                            this@TimerFragment,
+                            null
+                        )
+                    }
+                    handler?.postDelayed(this, interval)
+                }
+            }, interval)
+        }
+    }
+
+    private fun stopLocationUpdates() { // API Stuff
+        Log.d("API", "Stopping location updates") // Log statement to verify
+        handler?.removeCallbacksAndMessages(null)
+    }
+
+    private fun logLocationToAPI(location: Location) { // API Stuff
+        val client = OkHttpClient()
+        val url =
+            "https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}"
+        Log.d("API", "Requesting URL: $url") // Log the request URL
+
+        val request = Request.Builder().url(url).build()
+
+        client.newCall(request).enqueue(object : okhttp3.Callback {
+            override fun onFailure(call: okhttp3.Call, e: IOException) {
+                e.printStackTrace()
+                Log.e("API", "Request failed: ${e.message}") // Log failure
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                if (!response.isSuccessful) {
+                    Log.e("API", "Unexpected code $response")
+                } else {
+                    val responseData = response.body?.string()
+                    if (responseData != null) {
+                        Log.d("API", "Response data: $responseData") // Log response data
+                    }
+                }
+            }
+        })
     }
 }

@@ -42,6 +42,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Get location" />
+<!--Button to finish run-->
+    <Button
+        android:id="@+id/finishRunButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finish Run"/>
 
     <TextView
         android:id="@+id/textView"
