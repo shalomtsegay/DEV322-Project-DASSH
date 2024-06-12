@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_welcomeFragment_to_timerFragment"
             app:destination="@id/timerFragment" />
+        <action
+            android:id="@+id/action_timerFragment_to_resultsFragment"
+            app:destination="@id/resultsFragment" />
     </fragment>
 
     <fragment
@@ -23,10 +26,19 @@
         <action
             android:id="@+id/action_timerFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
+        <!-- Action to navigate from TimerFragment to WelcomeFragment -->
+        <action
+            android:id="@+id/action_timerFragment_to_welcomeFragment"
+            app:destination="@id/welcomeFragment" />
     </fragment>
     <fragment
         android:id="@+id/resultsFragment"
         android:name="com.hfad.dev322projectdassh.ResultsFragment"
         android:label="fragment_results"
         tools:layout="@layout/fragment_results" />
+    <!-- Action to navigate from TimerFragment to WelcomeFragment -->
+    <action
+        android:id="@+id/action_timerFragment_to_welcomeFragment"
+        app:destination="@id/timerFragment" />
+
 </navigation>

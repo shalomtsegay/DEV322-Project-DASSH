@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/welcomeFragment"
+        android:icon="@android:drawable/btn_radio"
+        android:title="Welcome" />
+    <item
+        android:id="@+id/timerFragment"
+        android:icon="@android:drawable/btn_radio"
+        android:title="Start Run" />
+    <item
+        android:id="@+id/resultsFragment"
+        android:icon="@android:drawable/btn_radio"
+        android:title="Run Results" />
+
+</menu>
