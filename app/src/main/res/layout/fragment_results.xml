@@ -1,12 +1,19 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ResultsFragment">
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/map"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Results"
+        android:textSize="24sp"
+        android:layout_gravity="center"/>
+
+    <com.hfad.dev322projectdassh.LocationPathView
+        android:id="@+id/locationPathView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</RelativeLayout>
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_green_light"/>
+</LinearLayout>

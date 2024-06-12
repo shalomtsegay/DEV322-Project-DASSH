@@ -147,6 +147,8 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             bundle.putParcelableArrayList("locations", geoPointList)
 
             view.findNavController().navigate(R.id.action_timerFragment_to_resultsFragment, bundle)
+            stopLocationUpdates() // API Stuff
+
         }
 
 
