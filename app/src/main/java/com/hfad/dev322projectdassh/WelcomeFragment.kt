@@ -25,9 +25,11 @@ class WelcomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        // Setup the view to be inflated and button to navigate - Stephen Orendain
         val view = inflater.inflate(R.layout.fragment_welcome, container, false)
         val startButton = view.findViewById<Button>(R.id.start)
 
+        // Navigation to Next Fragment - Stephen Orendain
         startButton.setOnClickListener {
             // code that runs when button is clicked
             view.findNavController()

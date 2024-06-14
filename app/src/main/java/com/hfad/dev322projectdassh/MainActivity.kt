@@ -19,6 +19,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        // Stephen Orendains contributions of Bottom Navigation Bar
         // Get a reference to the NavHostFragment and NavController
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -27,25 +29,25 @@ class MainActivity : AppCompatActivity() {
         val bottomNavView = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNavView.setupWithNavController(navController)
 
-        // Handle click on the bottom navigation item corresponding to the WelcomeFragment
+        // Handle bottom navigation to be able to navigate to different fragments after navigating through buttons - Stephen Orendain
         bottomNavView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.welcomeFragment -> {
-                    // Navigate to WelcomeFragment
+                    // Navigate to WelcomeFragment - Stephen Orendain
                     if (navController.currentDestination?.id != R.id.welcomeFragment) {
                         navController.navigate(R.id.welcomeFragment)
                     }
-                    true // Indicate that the item click has been handled
+                    true
                 }
                 R.id.timerFragment -> {
-                    // Navigate to timer fragment
+                    // Navigate to timer fragment - Stephen Orendain
                     if (navController.currentDestination?.id != R.id.timerFragment) {
                         navController.navigate(R.id.timerFragment)
                     }
-                    true // Indicate that the item click has been handled
+                    true
                 }
                 R.id.resultsFragment -> {
-                    // Navigate to Results fragment
+                    // Navigate to Results fragment - Stephen Orendain
                     if (navController.currentDestination?.id != R.id.resultsFragment) {
                         navController.navigate(R.id.resultsFragment)
                     }
@@ -54,5 +56,7 @@ class MainActivity : AppCompatActivity() {
                 else -> false // Return false for other items
             }
         }
+
+        // Stephen Orendain's Contributions of Bottom Navigation Bar End
     }
 }

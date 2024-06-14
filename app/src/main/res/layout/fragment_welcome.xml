@@ -8,7 +8,7 @@
     android:gravity="center_horizontal"
     tools:context=".WelcomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Setup the First Page welcome page to the users - Stephen Orendain -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +23,8 @@
         android:layout_marginTop="20dp"
         android:textSize="20sp"
         android:text="@string/welcome_text" />
+
+    <!-- Button to navigate to next fragment -->
     <Button
         android:id="@+id/start"
         android:layout_width="wrap_content"

@@ -15,6 +15,7 @@ class LocationPathView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
+    // Functionality developed by Shalom Tsegay
     private val paint = Paint().apply {
         color = Color.RED
         strokeWidth = 8f

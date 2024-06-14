@@ -13,6 +13,7 @@ class ResultsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Shalom Tsegays Contribution for Results Fragment - Setting up fragment and using api to get data
         val view = inflater.inflate(R.layout.fragment_results, container, false)
 
         val locationPathView = view.findViewById<LocationPathView>(R.id.locationPathView)

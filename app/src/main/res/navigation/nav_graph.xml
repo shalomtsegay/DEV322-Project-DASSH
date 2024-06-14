@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/welcomeFragment">
-
+<!-- Setup navigation between fragment through buttons and bottom navigation bar - Stephen Orendain-->
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.hfad.dev322projectdassh.WelcomeFragment"
@@ -13,6 +13,7 @@
         <action
             android:id="@+id/action_welcomeFragment_to_timerFragment"
             app:destination="@id/timerFragment" />
+        <!-- Action to navigate from welcome fragment to Results Fragment for Bottom Navigation Bar - Stephen Orendain-->
         <action
             android:id="@+id/action_timerFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
@@ -26,7 +27,7 @@
         <action
             android:id="@+id/action_timerFragment_to_resultsFragment"
             app:destination="@id/resultsFragment" />
-        <!-- Action to navigate from TimerFragment to WelcomeFragment -->
+        <!-- Action to navigate from TimerFragment to WelcomeFragment for Bottom Navigation Bar - Stephen Orendain -->
         <action
             android:id="@+id/action_timerFragment_to_welcomeFragment"
             app:destination="@id/welcomeFragment" />
@@ -36,7 +37,7 @@
         android:name="com.hfad.dev322projectdassh.ResultsFragment"
         android:label="fragment_results"
         tools:layout="@layout/fragment_results" />
-    <!-- Action to navigate from TimerFragment to WelcomeFragment -->
+    <!-- Action to navigate from Results Fragment to WelcomeFragment for Bottom Navigation Bar - Stephen Orendain -->
     <action
         android:id="@+id/action_timerFragment_to_welcomeFragment"
         app:destination="@id/timerFragment" />

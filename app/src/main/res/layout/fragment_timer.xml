@@ -23,32 +23,33 @@
         android:layout_height="wrap_content"
         android:text="@string/start" />
 
-<!--    pause button-->
+<!--    pause button - Stephen Orendain / Shalom Tsegay -->
     <Button
         android:id="@+id/pause_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/pause" />
 
-<!--    reset button-->
+<!--    reset button - Stephen Orendain / Shalom Tsegay -->
     <Button
         android:id="@+id/reset_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/reset" />
-<!--GPS Button -->
+<!--GPS Button - Stephen Orendain / Daniel Kamanda -->
     <Button
         android:id="@+id/getLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Get location" />
-<!--Button to finish run-->
+<!--Button to finish run - Shalom Tsegay-->
     <Button
         android:id="@+id/finishRunButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Finish Run"/>
 
+    <!-- Displaying our Results - Asher Parker and Daniel Kamanda-->
     <TextView
         android:id="@+id/textView"
         android:layout_width="182dp"
