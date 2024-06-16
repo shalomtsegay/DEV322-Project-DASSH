@@ -34,42 +34,36 @@ import org.osmdroid.util.GeoPoint // osmdroid Stuff
 
 
 class TimerFragment : Fragment(), SensorEventListener, LocationListener {
-    // Stephens Contribution For TImer Fragment - Helped setup the initial timer fragment for stopwatch, integrate and update functionality like gps and accelerometer to our main app version.
-    // Asher Parter Contributions - Helpsed set the initial functionality of the accelerometer.
-    // Daniel Kamanda Contributions - Helped set up the functionality for getting our location using the gps
-    // Shalom Tsegay Contributions - Helped setup the functionality of our API and Timer for MainActivity of our app
+    private lateinit var stopwatch: Chronometer // The chronometer
+    private var running = false // Is the chronometer running?
+    private var offset: Long = 0 // The base offset for the chronometer
 
-    private lateinit var stopwatch: Chronometer // The chronometer - Stephen
-    private var running = false // Is the chronometer running? - Stephen
-    private var offset: Long = 0 // The base offset for the chronometer - Stephen-
-
-    // Add key Strings for use with the Bundle - Stephen
+    // Add key Strings for use with the Bundle
     private val OFFSET_KEY = "offset"
     private val RUNNING_KEY = "running"
     private val BASE_KEY = "base"
 
 
-    //Sensor Stuff - Asher Parker
+    //Sensor Stuff
     private lateinit var mSensorManager: SensorManager
     private var mAccelerometer: Sensor? = null
-    private var resume = false;
+    private var resume = false
 
-    // GPS Stuff - Daniel Kamanda
+    // GPS Stuff
     private lateinit var locationManager: LocationManager
     private lateinit var tvGpsLocation: TextView
     private val locationPermissionCode = 2
 
-    // API Stuff - Shalom Tsegay
+    // API variables, set interval of api call to 5 seconds, declare list for logged locations
     private var handler: Handler? = null
     private val interval = 5000L // 5 seconds
 
-    private val locationList: MutableList<Location> = mutableListOf() // osmdroid Stuff
+    private val locationList: MutableList<Location> = mutableListOf()
 
 
 
-    // needed for find view by id - Stephen
+    // needed for find view by id
     private var rootView: View? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +78,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         // initialize
         tvGpsLocation = view.findViewById(R.id.gpsTextView)
 
-        // Initialize sensor manager and accelerometer - Asher Parker
+        // Initialize sensor manager and accelerometer
         mSensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
 
@@ -92,10 +86,10 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
 
 
-        // Get a reference to the stopwatch - Stephen Orendain / Shalom Tsegay
+        // Get a reference to the stopwatch
         stopwatch = view.findViewById(R.id.stopwatch)
 
-        // Restore the previous state - Stephen Orendain / Shalom Tsegay
+        // Restore the previous state
         if (savedInstanceState != null) {
             offset = savedInstanceState.getLong(OFFSET_KEY)
             running = savedInstanceState.getBoolean(RUNNING_KEY)
@@ -107,7 +101,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             }
         }
 
-        // Start button - Stephen Orendain / Shalom Tsegay
+        // Start button, start timer and API location updates
         val startButton = view.findViewById<Button>(R.id.start_button)
         startButton.setOnClickListener {
             if (!running) {
@@ -119,7 +113,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             }
         }
 
-        // Pause button - Stephen Orendain / Shalom Tsegay
+        // Pause button, pause timer and API location updates
         val pauseButton = view.findViewById<Button>(R.id.pause_button)
         pauseButton.setOnClickListener {
             if (running) {
@@ -131,20 +125,20 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
             }
         }
 
-        // Reset button - Stephen Orendain / Shalom Tsegay
+        // Reset button, reset timer
         val resetButton = view.findViewById<Button>(R.id.reset_button)
         resetButton.setOnClickListener {
             offset = 0
             setBaseTime()
         }
 
-        // Get location button
+        // Get location button for sensor
         val getLocationButton = view.findViewById<Button>(R.id.getLocation)
         getLocationButton.setOnClickListener {
             getLocation()
         }
 
-        // Finish Run button
+        // Finish Run button, stop the timer and stop new location updates from API
         val finishRunButton = view.findViewById<Button>(R.id.finishRunButton)
         finishRunButton.setOnClickListener {
             val bundle = Bundle()
@@ -161,7 +155,6 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         return view
     }
 
-    // Pause the Timer - Stephen Orendain / Shalom Tsegay
     override fun onPause() {
         super.onPause()
         Log.d("TimerFragment", "onPause called") // Log statement for testing
@@ -175,7 +168,6 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         }
     }
 
-    // Resume Timer - Stephen Orendain / Shalom Tsegay
     override fun onResume() {
         super.onResume()
         Log.d("TimerFragment", "onResume called") // Log statement for testing
@@ -206,7 +198,6 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         offset = SystemClock.elapsedRealtime() - stopwatch.base
     }
 
-    // Accelerometer Stuff - Asher Parker
     override fun onSensorChanged(event: SensorEvent?) {
         if (event != null) {
             if (event.sensor.type == Sensor.TYPE_LINEAR_ACCELERATION) {
@@ -221,7 +212,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         return
     }
 
-    //GPS Stuff - Daniel Kamanda / Asher Parker / Stephen Orendain
+    //GPS Stuff
     override fun onLocationChanged(location: Location) {
         tvGpsLocation.text =
             "Latitude: " + location.latitude + " , Longitude: " + location.longitude
@@ -231,7 +222,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
     }
 
-    //GPS Stuff - Daniel Kamanda / Asher Parker / Stephen Orendain
+    //GPS Stuff
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -250,7 +241,7 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
 
     }
 
-    //GPS Stuff - Daniel Kamanda / Asher Parker / Stephen Orendain
+    //GPS Stuff
     private fun getLocation() {
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -268,13 +259,15 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
     }
 
-    private fun startLocationUpdates() { // API Stuff - Shalom Tsegay
+    private fun startLocationUpdates() { // API Stuff
         Log.d("API", "Starting location updates") // Log statement to verify
+        // check all needed permissions are granted
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            //
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
             handler = Handler(Looper.getMainLooper())
             handler?.postDelayed(object : Runnable {
@@ -296,11 +289,13 @@ class TimerFragment : Fragment(), SensorEventListener, LocationListener {
         }
     }
 
-    private fun stopLocationUpdates() { // API Stuff - Shalom Tsegay
+        // Stop location updates from API
+    private fun stopLocationUpdates() { // API Stuff
         Log.d("API", "Stopping location updates") // Log statement to verify
         handler?.removeCallbacksAndMessages(null)
     }
 
+        // Get location from API
     private fun logLocationToAPI(location: Location) { // API Stuff
         val client = OkHttpClient()
         val url =

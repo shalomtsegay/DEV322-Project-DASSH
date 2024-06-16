@@ -11,6 +11,7 @@
         android:textSize="24sp"
         android:layout_gravity="center"/>
 
+
     <com.hfad.dev322projectdassh.LocationPathView
         android:id="@+id/locationPathView"
         android:layout_width="match_parent"

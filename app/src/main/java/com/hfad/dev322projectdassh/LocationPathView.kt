@@ -16,17 +16,22 @@ class LocationPathView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     // Functionality developed by Shalom Tsegay
+    // Choose the color and stroke width of the lines to create the route
     private val paint = Paint().apply {
         color = Color.RED
         strokeWidth = 8f
     }
 
+    // List of all logged locations from the API
     var locations: List<GeoPoint> = emptyList()
         set(value) {
             field = value
             invalidate() // Redraw the view when the locations are updated
         }
 
+    // Function to control the drawing of the route.
+    // Start with an empty page, draw red dots for each logged location, then connect
+    // them using a red line
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
